@@ -61,6 +61,9 @@ class Command:
 
     def check_aws(self):
         return self.is_in_path('aws')
+    
+    def check_serverspace(self):
+        return True
 
     def check_azure(self):
         return self.is_in_path('az')

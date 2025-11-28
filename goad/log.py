@@ -2,7 +2,7 @@ from rich import print
 
 from goad.utils import *
 
-log_level = INFO
+log_level = DEBUG
 
 
 class Log:

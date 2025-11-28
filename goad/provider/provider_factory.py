@@ -15,7 +15,8 @@ if Dependencies.proxmox_enabled:
     from goad.provider.terraform.proxmox import ProxmoxProvider
 if Dependencies.ludus_enabled:
     from goad.provider.ludus.ludus import LudusProvider
-
+if Dependencies.serverspace_enabled:
+    from goad.provider.terraform.serverspace import ServerSpaceProvider
 
 class ProviderFactory:
 
@@ -36,4 +37,6 @@ class ProviderFactory:
             provider = AwsProvider(lab_name, config)
         elif provider_name == LUDUS and Dependencies.ludus_enabled:
             provider = LudusProvider(lab_name, config)
+        elif provider_name == SERVERSPACE:
+            provider = ServerSpaceProvider(lab_name, config)
         return provider

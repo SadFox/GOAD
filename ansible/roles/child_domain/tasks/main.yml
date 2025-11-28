@@ -64,7 +64,7 @@
         $pass = ConvertTo-SecureString $Password -AsPlainText -Force
         $Cred = New-Object System.Management.Automation.PSCredential ($DomainAdmin, $pass)
         $safePassword = ConvertTo-SecureString $DomSafePassword -AsPlainText -Force
-        Install-ADDSDomain -Credential $Cred -SkipPreChecks -NewDomainName $NewDomainName -NewDomainNetbiosName $NewDomainNetbiosName -ParentDomainName $ParentDomainName -ReplicationSourceDC $ReplicationSourceDC -DatabasePath "C:\Windows\NTDS" -SYSVOLPath "C:\Windows\SYSVOL" -LogPath "C:\Windows\Logs" -SafeModeAdministratorPassword $safePassword -Force -NoRebootOnCompletion
+        Install-ADDSDomain -Credential $Cred -SkipPreChecks -NewDomainName $NewDomainName -NewDomainNetbiosName $NewDomainNetbiosName -ParentDomainName $ParentDomainName -ReplicationSourceDC $ReplicationSourceDC -DatabasePath "C:\Windows\NTDS" -SYSVOLPath "C:\Windows\SYSVOL" -LogPath "C:\Windows\Logs" -SafeModeAdministratorPassword $safePassword -Force
       } else {
         $Ansible.Changed = $false
       }
@@ -81,8 +81,13 @@
 - name: Reboot
   win_reboot:
     reboot_timeout: 900
-    post_reboot_delay: 100
+    post_reboot_delay: 300
   when: child_result.changed
+
+- name: Reboot
+  win_reboot:
+    reboot_timeout: 900
+    post_reboot_delay: 300
 
 # - name: "enable interface {{nat_adapter}} after domain joined"
 #   win_shell: netsh interface set interface "{{nat_adapter}}" enable
@@ -92,7 +97,9 @@
 #   delay: 120
 
 - name: enable the {{domain_adapter}} interface (local) for DNS client requests
-  ansible.windows.win_shell: dnscmd . /resetlistenaddresses {{ hostvars[dict_key].ansible_host }}
+  ansible.windows.win_shell: |
+    Install-WindowsFeature DNS -IncludeManagementTools
+    dnscmd . /resetlistenaddresses {{ hostvars[dict_key].ansible_host }}
   when: two_adapters
 
 - name: Check for xDnsServer Powershell module
